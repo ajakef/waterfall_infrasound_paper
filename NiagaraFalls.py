@@ -4,10 +4,12 @@ import rasterio
 import pandas as pd
 import obspy
 import gemlog
+import os
 from rasterio.plot import plotting_extent
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
 from matplotlib.colors import TwoSlopeNorm
+os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper')
 #%% definitions
 df = pd.read_excel("other_data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
 impedance = 340*1.2
@@ -39,7 +41,7 @@ else:
 # True color, L2A (not L1C), 32-bit float, high res, TIFF
 
 # Read Sentinel-2 image
-tif_path = "aerial_photos/2025-07-04-00_00_2025-07-04-23_59_Sentinel-2_L2A_True_color_v2.tiff"
+tif_path = "other_data/aerial_photos/2025-07-04-00_00_2025-07-04-23_59_Sentinel-2_L2A_True_color_v2.tiff"
 
 with rasterio.open(tif_path) as src:
     img = src.read([1, 2, 3])  # read R,G,B bands
@@ -83,7 +85,7 @@ df_gps = gemlog.summarize_gps(gps_dir, t1 = t1-3600, t2 = t2+3600, include_SN = 
 #%% calculate infrasound dB at the selected regional sites
 dB = np.zeros(len(SN_list))
 for i, SN in enumerate(df_gps.SN):
-    tr = obspy.read(f'/home/jake/Dropbox/StreamAcoustics/NiagaraFalls/2024-09-24_Download/mseed*/{t1.strftime("%Y-%m-%d")}*{SN}*')[0]
+    tr = obspy.read(f'mseed/NiagaraFalls/{t1.strftime("%Y-%m-%d")}*{SN}*')[0]
     tr.filter('highpass', freq = 0.5, corners = 4)
     tr.trim(t1, t2)
     dB[i] = 20*np.log10(tr.std() * 3.5012e-3/20e-6)
@@ -110,7 +112,7 @@ cbar.set_label('Observed - Modeled (dB)')
 # "Contains information licensed under the Open Government Licence – Niagara Falls (Ontario, Canada)."
 # City of Niagara Falls (Ontario) Open Data
 ax = axes[1]
-tif_path = 'aerial_photos/Niagara Falls 2018 Ortho Imagery.jpg'
+tif_path = 'other_data/aerial_photos/Niagara Falls 2018 Ortho Imagery.jpg'
 with rasterio.open(tif_path) as src:
     img = src.read([1, 2, 3])  # read R,G,B bands
 
@@ -165,8 +167,8 @@ ax.set_title("B. Modeled Infrasound from Niagara Falls (detail)", loc = 'left')
 # 266 2024-08-15 16:26:30-16:19:30 UTC tunnel outlet ~3 Pa RMS
 # 266 2024-08-15 17:20:00-17:21:40 UTC Canada parking lot
 
-df_gps = gemlog.read_gps('../NiagaraFalls/2024-08-14_NiagaraFallsUSA/gps', SN = '268')
-tr = obspy.read('../NiagaraFalls/2024-08-14_NiagaraFallsUSA/mseed/2024-08-14T21_01_18..268..HDF.mseed')[0]
+df_gps = gemlog.read_gps('other_data/NiagaraFalls_GPS', SN = '268')
+tr = obspy.read('mseed/NiagaraFalls/2024-08-14T21_01_18..268..HDF.mseed')[0]
 tr.filter('highpass', freq = 0.5)
 t = np.array([obspy.UTCDateTime(t) for t in df_gps.t])
 
@@ -193,10 +195,10 @@ for i in range(len(t1_list1)):
     rms_list = np.append(rms_list, tr.slice(t1_list1[i], t2_list1[i]).std() * 3.5012e-3)
     
 #%% Calculate lats and lons for Aug 15 infrasound survey stops
-df_gps = gemlog.read_gps('../NiagaraFalls/2024-08-15_NiagaraFalls/gps', SN = '266')
+df_gps = gemlog.read_gps('other_data/NiagaraFalls_GPS', SN = '266')
 t = np.array([obspy.UTCDateTime(t) for t in df_gps.t])
 
-tr = obspy.read('../NiagaraFalls/2024-08-15_NiagaraFalls/mseed/2024-08-15T14_33_21..266..HDF.mseed')[0]
+tr = obspy.read('mseed/NiagaraFalls/2024-08-15T14_33_21..266..HDF.mseed')[0]
 tr.filter('highpass', freq = 0.5)
 
 # manually enter start/stop times at each location (excluding motion and transient noise)

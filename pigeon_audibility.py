@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Oct 28 11:36:36 2025
 
-@author: jake
-"""
 #%% imports
 import numpy as np
 import pandas as pd
 import obspy
 import gemlog
+import os
 import matplotlib.pyplot as plt
 import riversound
+import sys; sys.path.append('code')
 from waterfall_functions import *
-
+os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper')
 
 #%% calculate waterfall spectra
 impedance = 340*1.2
@@ -27,7 +24,7 @@ bitweight[9] = 0.256/2**15 / (3.1/7 * 46e-6 * (1+49.7/2.2)) # mesa falls
 df['rms'] = df['geo_mean_freq'] = df['mean_freq'] = df['med_freq'] = df['power_acoustic_W'] = np.zeros(df.shape[0])
 for i in range(df.shape[0]):
     print((i, df.site[i]))
-    tr = obspy.read('spectra_mseeds/' + df.filename[i])[0] # still in counts, need to fix this
+    tr = obspy.read('mseed/spectra_mseeds/' + df.filename[i])[0] # still in counts, need to fix this
     tr.data = tr.data * bitweight[i]
     tr.filter('highpass', freq = df.freq_low[i], corners = 2)
     t1 = obspy.UTCDateTime(df.date.astype(str)[i] + ' ' + df.t1.astype(str)[i])
@@ -45,6 +42,10 @@ for i in range(df.shape[0]):
 # This assumes that acoustic power at all low frequencies can be scaled by the audiogram and
 # summed to determine audibility. So, it is a generous estimate of how far away a waterfall
 # can be heard.
+audiogram_df = pd.read_csv('other_data/PigeonAudiogram.csv', names = ['freq', 'dB'])
+audiogram_df['Pa2'] = 10**(audiogram_df['dB']/10) * (20e-6)**2
+audiogram = (20e-6)**2 * 10**(np.interp(np.log10(spectra[0]['freqs']), np.log10(audiogram_df.freq), audiogram_df.dB)/10)
+
 freqs = spectra[0]['freqs']
 dfreq = np.diff(freqs)[0]
 freq_range = [0.5, 30] # min and max frequencies to consider for audibility
@@ -58,9 +59,6 @@ for i in range(df.shape[0]):
     
 #%% plot Niagara spectrum vs pigeon audiogram
 ## the calculated spectra are one-sided, so no need to double it
-audiogram_df = pd.read_csv('PigeonAudiogram.csv', names = ['freq', 'dB'])
-audiogram_df['Pa2'] = 10**(audiogram_df['dB']/10) * (20e-6)**2
-audiogram = (20e-6)**2 * 10**(np.interp(np.log10(spectra[0]['freqs']), np.log10(audiogram_df.freq), audiogram_df.dB)/10)
 #xlim = [0.2, 30]
 xlim = freq_range
 fig, ax = plt.subplots(3,2, figsize = (9.5, 6.5))
