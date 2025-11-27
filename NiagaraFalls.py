@@ -173,6 +173,7 @@ tr.filter('highpass', freq = 0.5)
 t = np.array([obspy.UTCDateTime(t) for t in df_gps.t])
 
 # manually set start/end times for survey stops (exclude motion and transient noise)
+# discharge average 2980
 t1_list1 = ['21:02:09', '21:11:15', '21:22:13', '21:31:01', '21:40:00', '21:43:31', '21:49:29', 
             '21:52:58', '21:58:26', '22:02:23', '22:08:19', '22:11:57', '22:22:27', '22:25:31', 
             '22:34:01', '22:36:32.2', '22:48:55', '22:58:16', '23:04:22', '23:09:12', '23:21:49', '23:34:51', 
@@ -202,6 +203,7 @@ tr = obspy.read('mseed/NiagaraFalls/2024-08-15T14_33_21..266..HDF.mseed')[0]
 tr.filter('highpass', freq = 0.5)
 
 # manually enter start/stop times at each location (excluding motion and transient noise)
+# discharge average 2901
 t1_list2 = ['14:39:49', '14:48:30', '15:08:28', '15:24:54', '16:19:30', '16:53:20', '17:20:00']
 t2_list2 = ['14:40:13', '15:00:30', '15:09:50', '15:26:17', '16:26:30', '16:56:04', '17:21:40']
 t1_list2 = np.array([obspy.UTCDateTime(f'2024-08-15 {t}') for t in t1_list2])
@@ -220,8 +222,9 @@ lat_list[-4] = 43.07901; lon_list[-4] = -79.07840
 lat_list[-5] = 43.08210; lon_list[-5] = -79.07790
 lat_list[-1] = 43.08501; lon_list[-1] = -79.08226
 #%% Plot the Aug 14-15 infrasound survey locations with dB difference as color
-
-dB_diff = 20*np.log10(rms_list/20e-6) - model_NF_power(lon_list, lat_list, df.power_hydraulic_W[5]*1e-6)
+discharge = np.concatenate([np.repeat(2980.0, len(t1_list1)), np.repeat(2901.0, len(t1_list2))])
+power_infrasound = 1e-6 * 1000 * 9.8 * discharge * df.height_m[5]
+dB_diff = 20*np.log10(rms_list/20e-6) - model_NF_power(lon_list, lat_list, power_infrasound)
 norm = TwoSlopeNorm(vmin=-np.max(np.abs(dB_diff)), vcenter=0, vmax=np.max(np.abs(dB_diff)))
 sc = ax.scatter(lon_list, lat_list, c = dB_diff, norm = norm, cmap = 'bwr', s = 80, edgecolor = 'k')
 cbar = plt.colorbar(sc, ax=ax, shrink = 0.333)

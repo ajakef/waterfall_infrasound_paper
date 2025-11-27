@@ -34,12 +34,15 @@ for i in range(df.shape[0]):
     t2 = obspy.UTCDateTime(df.date.astype(str)[i] + ' ' + df.t2.astype(str)[i])
     tr.trim(t1, t2)
     s = riversound.spectrum(tr)
+    spectra.append(s) # save the barely-filtered spectrum to show low-freq background noise
+    # recalculate the spectrum after filtering to exclude low-freq background noise
+    tr.filter('highpass', freq = df.freq_low[i], corners = 2)
+    s = riversound.spectrum(tr) 
     df.loc[i, 'rms'] = np.std(tr.data) 
     df.loc[i, 'power_acoustic_W'] = df['rms'][i]**2 * 2*np.pi * df['distance_m'][i]**2 / impedance
     df.loc[i, 'geo_mean_freq'] = calc_geo_mean_freq(s['freqs'], s['median'])
     df.loc[i, 'mean_freq'] = calc_mean_freq(s['freqs'], s['median'])
     df.loc[i, 'med_freq'] = calc_med_freq(s['freqs'], s['median'])
-    spectra.append(s)
 #%% plot recorded spectra (Pa^2/Hz)
 ## important to use median spectrum to avoid intermittent noise, e.g. vehicles at Niagara
 waterfall_plot_indices = [1,2,3,4,5,6,15,16]
@@ -78,8 +81,9 @@ fig.savefig('figures/WaterfallSpectra.png')
 fig, ax = plt.subplots(2, 2, figsize = [9.5, 7.5])
 for i in range(df.shape[0]):
     if df.site[i][0] == '_':
-        ax[0,0].loglog(df.power_hydraulic_W[(i-1):(i+1)], df.power_acoustic_W[(i-1):(i+1)], color = df.cbcolor[i], linestyle = 'solid')
-    ax[0,0].loglog(df.power_hydraulic_W[i], df.power_pql_W[i], 
+        ax[0,0].loglog(df.power_hydraulic_W[(i-1):(i+1)], df.power_acoustic_W[(i-1):(i+1)], 
+                       color = df.cbcolor[i], linestyle = 'solid')
+    ax[0,0].loglog(df.power_hydraulic_W[i], df.power_acoustic_W[i], 
                color = df.cbcolor[i], marker = df.marker[i], linestyle = 'none', markersize=8, # default markersize=6
                label = df.site[i])
 ax[0,0].loglog([3e3, 3e9], [3e-3, 3e3], color = 'gray', linestyle = '--')
@@ -89,8 +93,8 @@ ax[0,0].set_xlabel('Hydraulic Power (W)')
 ax[0,0].set_ylabel('Acoustic Power (W)')
 
 ## the simple factor of 1e6 is consistent with the stats
-scipy.stats.linregress(np.log10(df.power_hydraulic_W), np.log10(df.power_pql_W)) # slope is 0.9, with std err 0.08
-np.mean(np.log10(df.power_pql_W) - np.log10(df.power_hydraulic_W)) # forcing slope 1, intercept is -5.97
+scipy.stats.linregress(np.log10(df.power_hydraulic_W), np.log10(df.power_acoustic_W)) # slope is 0.9, with std err 0.08
+np.mean(np.log10(df.power_acoustic_W) - np.log10(df.power_hydraulic_W)) # forcing slope 1, intercept is -5.97
 ## Plot frequencies
 ## using med_freq here. mean_freq, geo_mean_freq, and med_freq all work about the same; mean_freq 
 ## is higher than the others, and med_freq is easy to explain.
@@ -112,6 +116,7 @@ for i in range(df.shape[0]):
     ax[1,0].loglog((df.height_m)[i], df.med_freq[i], 
                color = df.cbcolor[i], marker = df.marker[i], linestyle = 'none', markersize=8, # default markersize=6
                label = df.site[i])
+ax[1,0].loglog([5, 100], 20*np.array([5,100])**-0.25, color = 'gray', linestyle = '--') #degree -1/4 line
 ax[1,0].set_yticks([2,5,10,20], [2,5,10,20])
 ax[1,0].set_title('C. Frequency vs. Height', loc = 'left')
 ax[1,0].set_xlabel('Waterfall Height (m)')
@@ -123,12 +128,16 @@ for i in range(df.shape[0]):
     ax[1,1].loglog((df.discharge_m3s)[i], df.med_freq[i], 
                color = df.cbcolor[i], marker = df.marker[i], linestyle = 'none', markersize=8, # default markersize=6
                label = df.site[i])
+ax[1,1].loglog([0.25, 4000], 10**1.16*np.array([0.25,4000])**-0.1941, color = 'gray', linestyle = '--') #degree -1/4 line
+
 ax[1,1].set_yticks([2,5,10,20], [2,5,10,20])
 ax[1,1].set_title('D. Frequency vs. Discharge', loc = 'left')
 ax[1,1].set_xlabel('Discharge (m$^3$/s)')
 ax[1,1].set_ylabel('Median Frequency (Hz)')
 
 scipy.stats.linregress(np.log10(df.power_hydraulic_W), np.log10(df.med_freq)) # slope is 0.9, with std err 0.08
+scipy.stats.linregress(np.log10(df.discharge_m3s), np.log10(df.med_freq)) # slope is 0.9, with std err 0.08
+scipy.stats.linregress(np.log10(df.height_m), np.log10(df.med_freq)) # slope is 0.9, with std err 0.08
 
 ax[1,0].legend(
     ncol=2,
@@ -142,10 +151,11 @@ ax[1,0].legend(
 fig.tight_layout()
 fig.savefig('figures/WaterfallStats.png')
 #%% old figure panel: spectra scaled by total hydraulic power
-for i in waterfall_plot_indices:
-    ax[1].loglog(spectra[i]['freqs'], spectra[i]['median'] * df.distance_m[i]**2 * 2*np.pi/impedance/df.power_hydraulic_W[i], 
-               label = df.site[i], color = df.cbcolor[i], linestyle = df.linestyle[i])
-ax[1].set_xlim([0.2, 30])
-ax[1].set_title('B. Scaled by Hydraulic Power', loc = 'left')
-ax[1].set_xlabel('Frequency (Hz)')
-ax[1].set_ylabel('Power Ratio Spectral Density (1/Hz)')
+if False:
+    for i in waterfall_plot_indices:
+        ax[1].loglog(spectra[i]['freqs'], spectra[i]['median'] * df.distance_m[i]**2 * 2*np.pi/impedance/df.power_hydraulic_W[i], 
+                   label = df.site[i], color = df.cbcolor[i], linestyle = df.linestyle[i])
+    ax[1].set_xlim([0.2, 30])
+    ax[1].set_title('B. Scaled by Hydraulic Power', loc = 'left')
+    ax[1].set_xlabel('Frequency (Hz)')
+    ax[1].set_ylabel('Power Ratio Spectral Density (1/Hz)')

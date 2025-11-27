@@ -67,7 +67,7 @@ right_y_axis.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f"{y:g}"))
 ax[0].set_xlim([pd.Timestamp('20240515', tz = 'UTC'), pd.Timestamp('20240629', tz = 'UTC')]) 
 ax[0].set_ylabel(r'Discharge (m$^3$/s)')
 ax[0].set_title('A. Palouse Falls Discharge and Acoustic Power', loc = 'left')
-ax[0].legend([l1, l2], ['Discharge', 'Acoustic Power'])
+ax[0].legend([l1, l2], ['Discharge', 'Acoustic Power'], loc = 'lower left')
 
 riversound.image(np.log10(np.array(sg)), t, s['freqs'], log_y = True, qmin = 0.3, ax = ax[1])
 ax[1].plot(t, np.log10(medfreqs), color = 'black')
@@ -123,7 +123,7 @@ while t < t2:
 rms = np.array(rms)
 medfreqs = np.array(medfreqs)
 #%% Lucky Peak discharge
-df = pd.read_csv("other_data/BoiseRiverDischarge2.csv", skiprows=2)#.iloc[:(365*24*4),:]
+df = pd.read_csv("other_data/BoiseRiverDischarge.csv", skiprows=2)#.iloc[:(365*24*4),:]
 df['t'] = pd.to_datetime(df.DATETIME) + pd.to_timedelta(6, unit='h') # USGS provides data in PDT
 df['Over_Div_Dam'] = pd.to_numeric(df.Over_Div_Dam, errors = 'coerce')/35.315 # convert to m3/sec
 df['LUC_QR'] = pd.to_numeric(df.LUC_QR, errors = 'coerce')/35.315 # convert to m3/sec
@@ -166,7 +166,7 @@ ax[2].set_xlim([pd.Timestamp('20170518', tz = 'UTC'), pd.Timestamp('20170621', t
 ax[2].set_ylim([200/F, 180])
 ax[2].set_ylabel(r'Discharge (m$^3$/s)')
 ax[2].set_title('C. Lucky Peak Discharge and Acoustic Power', loc = 'left')
-ax[2].legend([l1, l2], ['Discharge', 'Acoustic Power'])
+ax[2].legend([l1, l2], ['Discharge', 'Acoustic Power'], loc = 'lower left')
 
 
 riversound.image(np.log10(np.array(sg)[w,:]), t[w], s['freqs'], log_y = True, qmin = 0.3, ax = ax[3])
@@ -251,7 +251,7 @@ while t < t2:
 rms = np.array(rms)
 medfreqs = np.array(medfreqs)
 #%%
-df = pd.read_csv("BoiseRiverDischarge2.csv", skiprows=2)#.iloc[:(365*24*4),:]
+df = pd.read_csv("BoiseRiverDischarge.csv", skiprows=2)#.iloc[:(365*24*4),:]
 df['t'] = pd.to_datetime(df.DATETIME) + pd.to_timedelta(6, unit='h') # USGS provides data in PDT
 df['Over_Div_Dam'] = pd.to_numeric(df.Over_Div_Dam, errors = 'coerce')/35.315 # convert to m3/sec
 df['LUC_QR'] = pd.to_numeric(df.LUC_QR, errors = 'coerce')/35.315 # convert to m3/sec
