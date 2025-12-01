@@ -8,7 +8,6 @@ import os
 import riversound
 import scipy
 import sys
-os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
 from waterfall_functions import *
 
 #%% Read the spreadsheet
@@ -23,7 +22,6 @@ for i in range(df.shape[0]):
         df.loc[i, 'site'] = '_'+df.site[i]
 
 #%% calculate spectra and other stats
-impedance = 340*1.2
 spectra = []
 bitweight = np.ones(df.shape[0]) * 3.5012e-3 # Pa/count--this is correct for all recordings made on modern Gems (post 2017)
 bitweight[7:9] = 0.256/2**15 / (3.35/7 * 46e-6 * (1+49.7*(1/2.2+1/1))) # lucky peak in 2017

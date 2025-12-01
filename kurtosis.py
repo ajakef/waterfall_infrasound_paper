@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Nov 21 14:28:49 2025
-
-@author: jake
-"""
 #%% imports
 import numpy as np
 import pandas as pd
@@ -13,8 +6,6 @@ import gemlog
 import os
 import matplotlib.pyplot as plt
 import riversound
-os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper')
-import sys; sys.path.append('code')
 from waterfall_functions import *
 from scipy.stats import kurtosis
 from scipy.signal import detrend

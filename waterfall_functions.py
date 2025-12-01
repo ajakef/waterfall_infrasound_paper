@@ -9,3 +9,10 @@ def calc_med_freq(f, s):
         return f[np.where(np.cumsum(s) > (0.5*np.sum(s)))[0][0]]
     except:
         return np.nan
+
+temperature = 288 # Kelvin
+pressure = 90000 # Pa, approximately 1000 m asl
+R = 287.05
+sound_speed = np.sqrt(1.4 * R * temperature)
+density = pressure / (R * temperature)
+impedance = sound_speed * density

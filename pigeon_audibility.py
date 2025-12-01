@@ -6,11 +6,9 @@ import os
 import matplotlib.pyplot as plt
 import riversound
 import scipy
-os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
 from waterfall_functions import *
 
 #%% calculate waterfall spectra
-impedance = 340*1.2
 spectra = []
 df = pd.read_excel("../data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
 

@@ -8,7 +8,6 @@ import os
 import riversound
 import scipy
 import os
-os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
 from waterfall_functions import *
 
 
@@ -50,7 +49,6 @@ medfreqs = np.array(medfreqs)
 #%% plot Palouse Falls data
 from matplotlib.ticker import FixedLocator, FuncFormatter
 
-impedance = 340 * 1.2
 distance = 320.9
 t = pd.Timestamp(str(t1)) + pd.to_timedelta(np.arange(len(sg)), unit='D') + pd.to_timedelta(0.5, unit='h')
 
@@ -147,7 +145,6 @@ df['discharge'] = df['LUC_QR']
 
 from matplotlib.ticker import FixedLocator, FuncFormatter
 
-impedance = 340 * 1.2
 distance = 145
 t = pd.Timestamp(str(t1)) + pd.to_timedelta(np.arange(len(sg)), unit='D') + pd.to_timedelta(0.5, unit='h')
 

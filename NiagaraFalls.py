@@ -8,10 +8,10 @@ from rasterio.plot import plotting_extent
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
 from matplotlib.colors import TwoSlopeNorm
-os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
+from waterfall_functions import *
+
 #%% definitions
 df = pd.read_excel("../data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
-impedance = 340*1.2
 lon_HSF, lat_HSF = -79.07589, 43.07797
 lon_AF, lat_AF = -79.069831, 43.084487
 def model_NF_power(lon, lat, power_total = df.power_hydraulic_W[6] * 1e-6):
