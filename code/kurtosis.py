@@ -34,14 +34,14 @@ def norm(x, r=None):
 
 def dB(x): return 10 * np.log10(x)
 #%%
-st = obspy.read('mseed/PalouseFalls/2024-05-20T14*2..HDF.mseed')
+st = obspy.read('../data/kurtosis_mseeds/2024-05-20T14*2..HDF.mseed')
 st.sort() # 062, the noisy one, comes first
 t1 = obspy.UTCDateTime('2024-05-20T19:00')
 t2 = obspy.UTCDateTime('2024-05-20T19:05')#05
 st = st.detrend('linear')
 st.filter('highpass', freq = 1)
 st.trim(t1,t2)
-df = pd.read_excel("data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
+df = pd.read_excel("../data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
 for tr in st: 
     tr.data = tr.data * 3.5012e-3
 #%%
@@ -141,5 +141,5 @@ plt.ylabel('Power Spectral Density (Pa$^2$/Hz)', labelpad = -4) # labelpad to ma
 plt.title('e. Welch spectra (sensor 1)', loc = 'left')
 plt.tight_layout()
 
-plt.savefig('figures/figure_kurtosis_xc_palouse.png')
+plt.savefig('../figures/figure_kurtosis_xc_palouse.png')
 

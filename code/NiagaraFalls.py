@@ -78,7 +78,7 @@ df_gps = df_gps.loc[[str(SN) in SN_list for SN in df_gps.SN],:].reset_index(drop
 #%% calculate infrasound dB at the selected regional sites
 dB = np.zeros(len(SN_list))
 for i, SN in enumerate(df_gps.SN):
-    tr = obspy.read(f'../waterfall_recordings/NiagaraFalls/2024_infrasound_miniSEED/{t1.strftime("%Y-%m-%d")}*{SN}*')[0]
+    tr = obspy.read(f'../data/waterfall_recordings/NiagaraFalls/2024_infrasound_miniSEED/{t1.strftime("%Y-%m-%d")}*{SN}*')[0]
     tr.filter('highpass', freq = 0.5, corners = 4)
     tr.trim(t1, t2)
     dB[i] = 20*np.log10(tr.std() * 3.5012e-3/20e-6)
@@ -152,7 +152,7 @@ ax.set_title("B. Modeled Infrasound from Niagara Falls (detail)", loc = 'left')
 # 266 2024-08-15 17:20:00-17:21:40 UTC Canada parking lot
 
 df_gps = gemlog.read_gps('../data/waterfall_recordings/NiagaraFalls/NiagaraFalls_GPS', SN = '268')
-tr = obspy.read('../data/waterfall_recordings/NiagaraFalls/2024-08-14T21_01_18..268..HDF.mseed')[0]
+tr = obspy.read('../data/waterfall_recordings/NiagaraFalls/2024_infrasound_miniSEED/2024-08-14T21_01_18..268..HDF.mseed')[0]
 tr.filter('highpass', freq = 0.5)
 t = np.array([obspy.UTCDateTime(t) for t in df_gps.t])
 
@@ -183,7 +183,7 @@ for i in range(len(t1_list1)):
 df_gps = gemlog.read_gps('../data/waterfall_recordings/NiagaraFalls/NiagaraFalls_GPS', SN = '266')
 t = np.array([obspy.UTCDateTime(t) for t in df_gps.t])
 
-tr = obspy.read('../data/waterfall_recordings/NiagaraFalls/2024-08-15T14_33_21..266..HDF.mseed')[0]
+tr = obspy.read('../data/waterfall_recordings/NiagaraFalls/2024_infrasound_miniSEED/2024-08-15T14_33_21..266..HDF.mseed')[0]
 tr.filter('highpass', freq = 0.5)
 
 # manually enter start/stop times at each location (excluding motion and transient noise)

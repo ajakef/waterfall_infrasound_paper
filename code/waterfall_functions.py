@@ -11,7 +11,7 @@ def calc_med_freq(f, s):
         return np.nan
 
 temperature = 288 # Kelvin
-pressure = 90000 # Pa, approximately 1000 m asl
+pressure = 100000 # Pa
 R = 287.05
 sound_speed = np.sqrt(1.4 * R * temperature)
 density = pressure / (R * temperature)
