@@ -5,14 +5,14 @@ import gemlog
 import os
 import matplotlib.pyplot as plt
 import riversound
+import scipy
 os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
-#import sys; sys.path.append('code')
 from waterfall_functions import *
 
 #%% calculate waterfall spectra
 impedance = 340*1.2
 spectra = []
-df = pd.read_excel("other_data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
+df = pd.read_excel("../data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
 
 bitweight = np.ones(df.shape[0]) * 3.5012e-3 # Pa/count--this is correct for all recordings made on modern Gems (post 2017)
 bitweight[7:9] = 0.256/2**15 / (3.35/7 * 46e-6 * (1+49.7*(1/2.2+1/1))) # lucky peak in 2017
@@ -21,7 +21,7 @@ bitweight[9] = 0.256/2**15 / (3.1/7 * 46e-6 * (1+49.7/2.2)) # mesa falls
 df['rms'] = df['geo_mean_freq'] = df['mean_freq'] = df['med_freq'] = df['power_acoustic_W'] = np.zeros(df.shape[0])
 for i in range(df.shape[0]):
     print((i, df.site[i]))
-    tr = obspy.read('mseed/spectra_mseeds/' + df.filename[i])[0] # still in counts, need to fix this
+    tr = obspy.read('../data/spectra_mseeds/' + df.filename[i])[0] # still in counts, need to fix this
     tr.data = tr.data * bitweight[i]
     tr.filter('highpass', freq = df.freq_low[i], corners = 2)
     t1 = obspy.UTCDateTime(df.date.astype(str)[i] + ' ' + df.t1.astype(str)[i])
@@ -38,7 +38,7 @@ for i in range(df.shape[0]):
 # This assumes that acoustic power at all low frequencies can be scaled by the audiogram and
 # summed to determine audibility. So, it is a generous estimate of how far away a waterfall
 # can be heard.
-audiogram_df = pd.read_csv('other_data/PigeonAudiogram.csv', names = ['freq', 'dB'])
+audiogram_df = pd.read_csv('../data/PigeonAudiogram.csv', names = ['freq', 'dB'])
 audiogram_df['Pa2'] = 10**(audiogram_df['dB']/10) * (20e-6)**2
 audiogram = (20e-6)**2 * 10**(np.interp(np.log10(spectra[0]['freqs']), np.log10(audiogram_df.freq), audiogram_df.dB)/10)
 
@@ -49,7 +49,6 @@ w = np.where((freqs >= freq_range[0]) & (freqs <= freq_range[1]))[0]
 
 df['pigeon_audibility_distance_m'] = np.zeros(df.shape[0])
 for i in range(df.shape[0]):
-    #w = np.where(spectra[i]['median'] > audiogram)[0]
     audibility = np.sum((spectra[i]['median']/audiogram)[w]) * 1/10.24
     df.loc[i, 'pigeon_audibility_distance_m'] = df.distance_m[i] * np.sqrt(audibility)
     if df.site[i] in np.array(df.site[:i]):
@@ -57,9 +56,8 @@ for i in range(df.shape[0]):
 
 #%% plot Niagara spectrum vs pigeon audiogram
 ## the calculated spectra are one-sided, so no need to double it
-#xlim = [0.2, 30]
+
 xlim = freq_range
-#fig, ax = plt.subplots(4,2, figsize = (9.5, 6.5))
 fig = plt.figure(figsize = (6.5*1.5, 9.5*1.5))
 gs = fig.add_gridspec(5,2)
 ax1 = []
@@ -105,8 +103,6 @@ ax2[2].set_xlabel('Frequency (Hz)')
 ## This integral is around 130 by about 27 Hz. So, it *should* be audible out to sqrt(130)*sensor_distace
 ## This comes out to 8.3 km.
 
-#fig, ax = plt.subplots(1,1, figsize = (9.5, 6.5))
-#ax.loglog(df.power_hydraulic_W, df.pigeon_audibility_distance_m, 'k.')
 ax = fig.add_subplot(gs[3:,:])
 for i in range(df.shape[0]):
     if df.site[i][0] == '_':
@@ -135,4 +131,4 @@ ax.set_ylabel('Pigeon Audibility Distance (m)')
 ax.set_title('G. Audibility Distance vs. Waterfall Hydraulic Power', loc = 'left')
 
 fig.tight_layout()
-fig.savefig('figures/PigeonAudibility.png')
+fig.savefig('../figures/PigeonAudibility.png')

@@ -1,12 +1,18 @@
-import matplotlib.pyplot as plt; import numpy as np; import gemlog; import glob; import pandas as pd; import obspy; import os;
-import riversound; import scipy
+import matplotlib.pyplot as plt
+import numpy as np 
+import gemlog
+import glob
+import pandas as pd
+import obspy
+import os
+import riversound
+import scipy
 import sys
 os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
-#sys.path.append('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code'); 
 from waterfall_functions import *
 
 #%% Read the spreadsheet
-df = pd.read_excel("../other_data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
+df = pd.read_excel("../data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
 
 for col in df.select_dtypes(include="Float64").columns:
     df[col] = df[col].astype(float)
@@ -26,7 +32,7 @@ bitweight[9] = 0.256/2**15 / (3.1/7 * 46e-6 * (1+49.7/2.2)) # mesa falls
 df['rms'] = df['geo_mean_freq'] = df['mean_freq'] = df['med_freq'] = df['power_acoustic_W'] = np.zeros(df.shape[0])
 for i in range(df.shape[0]):
     print((i, df.site[i]))
-    tr = obspy.read('../mseed/spectra_mseeds/' + df.filename[i])[0] # still in counts, need to fix this
+    tr = obspy.read('../data/spectra_mseeds/' + df.filename[i])[0] # still in counts, need to fix this
     tr.data = tr.data * bitweight[i]
     #tr.filter('highpass', freq = df.freq_low[i], corners = 2)
     tr.filter('highpass', freq = 0.01, corners = 4)

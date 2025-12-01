@@ -50,7 +50,7 @@ t2 = obspy.UTCDateTime('2024-05-20T19:05')#05
 st = st.detrend('linear')
 st.filter('highpass', freq = 1)
 st.trim(t1,t2)
-df = pd.read_excel("other_data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
+df = pd.read_excel("data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
 for tr in st: 
     tr.data = tr.data * 3.5012e-3
 #%%
