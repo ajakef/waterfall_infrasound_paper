@@ -23,13 +23,6 @@ from obspy.clients.nrl import NRL
 
 
 
-#%% get sensor locations for Palouse
-#gps = gemlog.summarize_gps('/home/jake/2024-06-28_PalouseFalls/gps')
-#%%
-#plt.plot(gps.lon, gps.lat, 'k.')
-#for i in range(3):
-#    plt.text(gps.lon[i], gps.lat[i], gps.SN[i])
-
 #%%
 def clip_sg(x):
     low = np.quantile(x, 0.02)
@@ -50,30 +43,10 @@ def norm(x, r=None):
 
 def dB(x): return 10 * np.log10(x)
 #%%
-if False:
-    st = obspy.read('/home/jake/Dropbox/Signal_Moments/WWP_phase2_1/mseed/*181..HDF.mseed') + obspy.read('/home/jake/Dropbox/Signal_Moments/WWP_phase2_1/mseed/*064..HDF.mseed')
-    t1 = obspy.UTCDateTime('2021-06-14T15:31')
-    t2 = obspy.UTCDateTime('2021-06-14T15:35')
-elif True:
-    st = obspy.read('mseed/PalouseFalls/2024-05-20T14*2..HDF.mseed')
-    st.sort() # 062, the noisy one, comes first
-    t1 = obspy.UTCDateTime('2024-05-20T19:00')
-    t2 = obspy.UTCDateTime('2024-05-20T19:05')#05
-elif False:
-    st = obspy.read('mseed/NiagaraFalls/2024-09-21T16*231..HDF.mseed') + obspy.read('mseed/NiagaraFalls/2024-09-21T16*245..HDF.mseed')
-    st.sort() # 231, the noisy one, comes first
-    t1 = obspy.UTCDateTime('2024-09-21T18:07')
-    t2 = obspy.UTCDateTime('2024-09-21T18:11')    
-elif False:
-    st = obspy.read('/home/jake/2023-04-22_ShoshoneFalls/mseed/2023-04-23T*218..HDF.mseed') + obspy.read('/home/jake/2023-04-22_ShoshoneFalls/mseed/2023-04-23T*200..HDF.mseed')
-    st.sort(reverse = True) # 218, the noisy one, comes first
-    t1 = obspy.UTCDateTime('2023-04-23T03:05')
-    t2 = obspy.UTCDateTime('2023-04-23T03:09')    
-else:
-    st = obspy.read('mseed/LadyFaceFalls/2023-05-24T*..HDF.mseed')
-    st.sort(reverse = False) # 148, the noisy one, comes first
-    t1 = obspy.UTCDateTime('2023-05-24T17:40')
-    t2 = obspy.UTCDateTime('2023-05-24T17:50')        
+st = obspy.read('mseed/PalouseFalls/2024-05-20T14*2..HDF.mseed')
+st.sort() # 062, the noisy one, comes first
+t1 = obspy.UTCDateTime('2024-05-20T19:00')
+t2 = obspy.UTCDateTime('2024-05-20T19:05')#05
 st = st.detrend('linear')
 st.filter('highpass', freq = 1)
 st.trim(t1,t2)

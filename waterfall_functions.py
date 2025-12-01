@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Oct 14 09:31:38 2025
-
-@author: jake
-"""
 import numpy as np
 
 def calc_mean_freq(f, s):

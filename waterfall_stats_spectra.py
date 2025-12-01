@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
 import matplotlib.pyplot as plt; import numpy as np; import gemlog; import glob; import pandas as pd; import obspy; import os;
 import riversound; import scipy
 import sys
-os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/')
-sys.path.append('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code'); from waterfall_functions import *
+os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
+#sys.path.append('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code'); 
+from waterfall_functions import *
 
 #%% Read the spreadsheet
-df = pd.read_excel("other_data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
+df = pd.read_excel("../other_data/waterfall_summary.ods", engine="odf", skiprows=1).convert_dtypes()
 
 for col in df.select_dtypes(include="Float64").columns:
     df[col] = df[col].astype(float)
@@ -26,7 +26,7 @@ bitweight[9] = 0.256/2**15 / (3.1/7 * 46e-6 * (1+49.7/2.2)) # mesa falls
 df['rms'] = df['geo_mean_freq'] = df['mean_freq'] = df['med_freq'] = df['power_acoustic_W'] = np.zeros(df.shape[0])
 for i in range(df.shape[0]):
     print((i, df.site[i]))
-    tr = obspy.read('mseed/spectra_mseeds/' + df.filename[i])[0] # still in counts, need to fix this
+    tr = obspy.read('../mseed/spectra_mseeds/' + df.filename[i])[0] # still in counts, need to fix this
     tr.data = tr.data * bitweight[i]
     #tr.filter('highpass', freq = df.freq_low[i], corners = 2)
     tr.filter('highpass', freq = 0.01, corners = 4)
@@ -76,7 +76,7 @@ ax[1].set_ylabel('Source Power Spectral Density (W/Hz)')
 #%%
 ax[0].legend()
 fig.tight_layout()
-fig.savefig('figures/WaterfallSpectra.png')
+fig.savefig('../figures/WaterfallSpectra.png')
 #%% Plot powers
 fig, ax = plt.subplots(2, 2, figsize = [9.5, 7.5])
 for i in range(df.shape[0]):
@@ -149,13 +149,4 @@ ax[1,0].legend(
     )
 
 fig.tight_layout()
-fig.savefig('figures/WaterfallStats.png')
-#%% old figure panel: spectra scaled by total hydraulic power
-if False:
-    for i in waterfall_plot_indices:
-        ax[1].loglog(spectra[i]['freqs'], spectra[i]['median'] * df.distance_m[i]**2 * 2*np.pi/impedance/df.power_hydraulic_W[i], 
-                   label = df.site[i], color = df.cbcolor[i], linestyle = df.linestyle[i])
-    ax[1].set_xlim([0.2, 30])
-    ax[1].set_title('B. Scaled by Hydraulic Power', loc = 'left')
-    ax[1].set_xlabel('Frequency (Hz)')
-    ax[1].set_ylabel('Power Ratio Spectral Density (1/Hz)')
+fig.savefig('../figures/WaterfallStats.png')

@@ -1,18 +1,17 @@
-#!/usr/bin/env python3
 import matplotlib.pyplot as plt; import numpy as np; import gemlog; import glob; import pandas as pd; import obspy; import os;
 import riversound; import scipy; import os
+os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
 from waterfall_functions import *
-os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/')
 
 
 #%% Palouse Falls: read discharge and infrasound
-df = pd.read_csv("other_data/PalouseFallsDischarge.txt", sep = '\t', skiprows=25, names = ['USGS', 'site', 'datetime', 'tz', 'discharge', 'valid'])
+df = pd.read_csv("../other_data/PalouseFallsDischarge.txt", sep = '\t', skiprows=25, names = ['USGS', 'site', 'datetime', 'tz', 'discharge', 'valid'])
 df['t'] = pd.to_datetime(df.datetime, utc = True) + pd.to_timedelta(7, unit='h') # USGS provides data in PDT
 df['discharge'] /= 35.315 # convert to m3/sec
 #plt.plot(df.t, df.discharge)
 
 st = obspy.Stream()
-for fn in sorted(glob.glob('mseed/PalouseFalls/2024-0*..122..HDF.mseed')):
+for fn in sorted(glob.glob('../mseed/PalouseFalls/2024-0*..122..HDF.mseed')):
     st += obspy.read(fn)
 st = st.merge(method = 1, fill_value = 'interpolate', interpolation_samples = 100)
 
@@ -84,7 +83,7 @@ fig.tight_layout()
 
 #%% Lucky Peak
 st = obspy.Stream()
-for fn in sorted(glob.glob('mseed/LuckyPeak/2017*/2017*')): # 013, limited 010
+for fn in sorted(glob.glob('../mseed/LuckyPeak/2017*/2017*')): # 013, limited 010
     print(fn)
     st += obspy.read(fn)
 #st = st.merge(method = 1, fill_value = 'interpolate', interpolation_samples = 100)
@@ -123,7 +122,7 @@ while t < t2:
 rms = np.array(rms)
 medfreqs = np.array(medfreqs)
 #%% Lucky Peak discharge
-df = pd.read_csv("other_data/BoiseRiverDischarge.csv", skiprows=2)#.iloc[:(365*24*4),:]
+df = pd.read_csv("../other_data/BoiseRiverDischarge.csv", skiprows=2)#.iloc[:(365*24*4),:]
 df['t'] = pd.to_datetime(df.DATETIME) + pd.to_timedelta(6, unit='h') # USGS provides data in PDT
 df['Over_Div_Dam'] = pd.to_numeric(df.Over_Div_Dam, errors = 'coerce')/35.315 # convert to m3/sec
 df['LUC_QR'] = pd.to_numeric(df.LUC_QR, errors = 'coerce')/35.315 # convert to m3/sec
@@ -180,7 +179,7 @@ ax[3].set_xlim([pd.Timestamp('20170518', tz = 'UTC'), pd.Timestamp('20170620', t
 ax[3].set_title('D. Lucky Peak Spectrogram', loc = 'left')
 
 fig.tight_layout()
-fig.savefig('figures/WaterfallsOverTime.png')
+fig.savefig('../figures/WaterfallsOverTime.png')
 
 
 

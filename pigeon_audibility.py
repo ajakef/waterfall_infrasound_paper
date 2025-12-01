@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-#%% imports
 import numpy as np
 import pandas as pd
 import obspy
@@ -8,8 +5,8 @@ import gemlog
 import os
 import matplotlib.pyplot as plt
 import riversound
-os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper')
-import sys; sys.path.append('code')
+os.chdir('/home/jake/Dropbox/StreamAcoustics/waterfall_paper/code')
+#import sys; sys.path.append('code')
 from waterfall_functions import *
 
 #%% calculate waterfall spectra
