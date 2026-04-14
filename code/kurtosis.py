@@ -58,7 +58,7 @@ win_length_sec = 10
 overlap = 0.9
 output_dict = waterfall_functions.apply_function_windows(st, f, win_length_sec, overlap)
 
-t_mid = output_dict['t_mid'] - t1
+t_mid = np.asarray(output_dict['t_mid'] - t1, dtype = float) # needed to prevent plotting problems
 st_plot = st.slice(output_dict['t_mid'].min(), output_dict['t_mid'].max())
 xc = output_dict['xc']
 k0 = output_dict['k0']
