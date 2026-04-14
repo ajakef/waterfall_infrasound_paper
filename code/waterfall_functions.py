@@ -5,6 +5,13 @@ from scipy.signal import spectrogram
 from scipy.ndimage import median_filter
 from scipy.stats import kurtosis, skew
 
+temperature = 288 # Kelvin
+pressure = 100000 # Pa
+R = 287.05
+sound_speed = np.sqrt(1.4 * R * temperature)
+density = pressure / (R * temperature)
+impedance = sound_speed * density
+
 def calc_mean_freq(f, s):
     return np.sum(f*s)/np.sum(s)
 def calc_geo_mean_freq(f, s):
