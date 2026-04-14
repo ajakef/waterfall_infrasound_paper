@@ -2,7 +2,7 @@
 import numpy as np
 import obspy
 import matplotlib.pyplot as plt
-import riversound
+import waterfall_functions
 from scipy.stats import kurtosis
 from scipy.signal import detrend
 import obspy.signal.cross_correlation
@@ -51,12 +51,12 @@ def f(st_tmp): # function to calculate sd, kurtosis, xc, and spectrogram for eac
     ## need to apply window function after calculating stats, before xc and sg
     st_tmp.taper(0.5, 'hamming')
     output_dict['xc'] = obspy.signal.cross_correlation.correlate(st_tmp[0], st_tmp[1], 20)
-    output_dict['sg'] = riversound.pgram(st_tmp[0], 0.01)['spectrum']
+    output_dict['sg'] = waterfall_functions.pgram(st_tmp[0], 0.01)['spectrum']
     return output_dict
 
 win_length_sec = 10
 overlap = 0.9
-output_dict = riversound.apply_function_windows(st, f, win_length_sec, overlap)
+output_dict = waterfall_functions.apply_function_windows(st, f, win_length_sec, overlap)
 
 t_mid = output_dict['t_mid'] - t1
 st_plot = st.slice(output_dict['t_mid'].min(), output_dict['t_mid'].max())
@@ -113,7 +113,7 @@ axA.set_title('a. Infrasound Time Series', loc = 'left')
 
 # panel B
 w = freq < 40
-im = riversound.image(np.log(clip_sg(sg[:,w])), t_mid, freq[w], log_y=True, ax=axB)
+im = waterfall_functions.image(np.log(clip_sg(sg[:,w])), t_mid, freq[w], log_y=True, ax=axB)
 axB.set_xlim(xmin, xmax)
 axB.set_ylim(np.log10([0.5, 30]))
 axB.set_xticks([])
@@ -135,7 +135,7 @@ axC.set_title('c. Window Kurtosis', loc = 'left')
  
 # panel D
 t_lag = 0.01 * (np.arange(xc.shape[1]) - (xc.shape[1]-1)/2)
-im2 = riversound.image(xc, t_mid, t_lag, ax=axD, zmin = -0.35, zmax = 1)
+im2 = waterfall_functions.image(xc, t_mid, t_lag, ax=axD, zmin = -0.35, zmax = 1)
 axD.set_xlim(xmin, xmax)
 axD.set_ylabel('Lag (s)')
 axD.set_title('d. Correlogram', loc='left')

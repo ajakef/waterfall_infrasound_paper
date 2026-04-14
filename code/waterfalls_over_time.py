@@ -5,7 +5,7 @@ import glob
 import pandas as pd
 import obspy
 import os
-import riversound
+import waterfall_functions
 import scipy
 import os
 from waterfall_functions import *
@@ -37,7 +37,7 @@ while t < t2:
     tr.filter('highpass', freq = 1, corners = 4)
     tr.data = tr.data * 3.5012e-3 
     print(tr)
-    s = riversound.spectrum(tr)
+    s = waterfall_functions.spectrum(tr)
     sg.append(s['median'])
     rms.append(tr.std())
     medfreqs.append(calc_med_freq(s['freqs'], s['median']))
@@ -76,7 +76,7 @@ ax[0].set_ylabel(r'Discharge (m$^3$/s)')
 ax[0].set_title('A. Palouse Falls Discharge and Acoustic Power', loc = 'left')
 ax[0].legend([l1, l2], ['Discharge', 'Acoustic Power'], loc = 'lower left')
 
-riversound.image(np.log10(np.array(sg)), t, s['freqs'], log_y = True, qmin = 0.3, ax = ax[1])
+waterfall_functions.image(np.log10(np.array(sg)), t, s['freqs'], log_y = True, qmin = 0.3, ax = ax[1])
 ax[1].plot(t, np.log10(medfreqs), color = 'black')
 ax[1].set_ylim([np.log10(2), np.log10(25)])
 ax[1].set_yticks(np.log10([2,5,10,20]), [2,5,10,20])
@@ -119,7 +119,7 @@ while t < t2:
     tr = st_tmp[0]
     tr.filter('highpass', freq = 1, corners = 4)
     tr.data = tr.data * bitweight
-    s = riversound.spectrum(tr)
+    s = waterfall_functions.spectrum(tr)
     medfreqs.append(calc_med_freq(s['freqs'], s['median']))
     sg.append(s['median'])
     # calculate power from med spec (safer in case of clips or invalid data)
@@ -175,7 +175,7 @@ ax[2].set_title('C. Lucky Peak Discharge and Acoustic Power', loc = 'left')
 ax[2].legend([l1, l2], ['Discharge', 'Acoustic Power'], loc = 'lower left')
 
 
-riversound.image(np.log10(np.array(sg)[w,:]), t[w], s['freqs'], log_y = True, qmin = 0.3, ax = ax[3])
+waterfall_functions.image(np.log10(np.array(sg)[w,:]), t[w], s['freqs'], log_y = True, qmin = 0.3, ax = ax[3])
 ax[3].plot(t[w], np.log10(medfreqs[w]), color = 'black')
 ax[3].set_ylim([np.log10(2), np.log10(25)])
 ax[3].set_yticks(np.log10([2,5,10,20]), [2,5,10,20])

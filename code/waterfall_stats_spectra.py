@@ -5,7 +5,7 @@ import glob
 import pandas as pd
 import obspy
 import os
-import riversound
+import waterfall_functions
 import scipy
 import sys
 from waterfall_functions import *
@@ -37,11 +37,11 @@ for i in range(df.shape[0]):
     t1 = obspy.UTCDateTime(df.date.astype(str)[i] + ' ' + df.t1.astype(str)[i])
     t2 = obspy.UTCDateTime(df.date.astype(str)[i] + ' ' + df.t2.astype(str)[i])
     tr.trim(t1, t2)
-    s = riversound.spectrum(tr)
+    s = waterfall_functions.spectrum(tr)
     spectra.append(s) # save the barely-filtered spectrum to show low-freq background noise
     # recalculate the spectrum after filtering to exclude low-freq background noise
     tr.filter('highpass', freq = df.freq_low[i], corners = 2)
-    s = riversound.spectrum(tr) 
+    s = waterfall_functions.spectrum(tr) 
     df.loc[i, 'rms'] = np.std(tr.data) 
     df.loc[i, 'power_acoustic_W'] = df['rms'][i]**2 * 2*np.pi * df['distance_m'][i]**2 / impedance
     df.loc[i, 'geo_mean_freq'] = calc_geo_mean_freq(s['freqs'], s['median'])
